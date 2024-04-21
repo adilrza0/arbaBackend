@@ -24,7 +24,7 @@ userRouter.get("/:userId",async(req,res)=>{
 
 
 // Update Profile Endpoint
-userRouter.put('/', async (req, res) => {
+userRouter.put('/:userId', async (req, res) => {
     const { userId } = req.params;
     
     const { fullName, avatar, currentPassword, newPassword } = req.body;
