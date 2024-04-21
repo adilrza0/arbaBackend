@@ -62,7 +62,7 @@ userRouter.put('/:userId', async (req, res) => {
   
       res.json({ message: 'Profile updated successfully' });
     } catch (error) {
-      console.error('Update profile error:', error);
+      console.log('Update profile error:', error);
       res.status(500).json({...error });
     }
   });
