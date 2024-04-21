@@ -101,8 +101,8 @@ productRouter.delete("/:productId", async (req, res) => {
 });
 
 // Read Products Endpoint with Filtering and Sorting
-productRouter.get("/", async (req, res) => {
-  const { userId } = req.body;
+productRouter.get("/:userId", async (req, res) => {
+  const {userId}=req.params
   try {
     // Parse query parameters
     const { category, title, sortBy, sortOrder, page, limit } = req.query;
