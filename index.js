@@ -4,6 +4,7 @@ const connection = require("./db");
 
 const { authRouter } = require("./Routers/auth.router");
 const { userRouter } = require("./Routers/user.router");
+const { productRouter } = require("./Routers/product.router");
 require("dotenv").config()
 
 const app=express();
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use("/auth",authRouter)
 app.use("/user",userRouter)
+app.use("/products",productRouter)
 
 app.listen(process.env.port,async()=>{
     await connection
