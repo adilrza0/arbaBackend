@@ -104,30 +104,49 @@ productRouter.delete("/:productId", async (req, res) => {
 productRouter.get("/", async (req, res) => {
   const { userId } = req.body;
   try {
-    let query = { owner: userId };
+    // Parse query parameters
+    const { category, title, sortBy, sortOrder, page, limit } = req.query;
 
-    // Filter by category
-    if (req.query.category) {
-      query.category = req.query.category;
+    // Build filter object
+    const filter = {owner:userId};
+    if (category) {
+      filter.category = category;
+    }
+    if (title) {
+      // Case-insensitive search
+      filter.title = { $regex: title, $options: 'i' };
     }
 
-    // Filter by title (case insensitive)
-    if (req.query.title) {
-      query.title = { $regex: req.query.title, $options: "i" };
+    // Build sort options
+    const sortOptions = {};
+    if (sortBy) {
+      sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
     }
 
-    // Sort by price (ascending or descending)
-    let sortOptions = {};
-    if (req.query.sortBy === "price") {
-      sortOptions.price = req.query.sortOrder === "desc" ? -1 : 1;
-    }
+    // Pagination
+    const pageNumber = parseInt(page) || 1;
+    const pageSize = parseInt(limit) || 8;
+    const skip = (pageNumber - 1) * pageSize;
 
-    // Retrieve products with filtering and sorting
-    const products = await Product.find(query).sort(sortOptions);
-    res.json(products);
+    // Query products with filter, sort, pagination, and limit
+    const products = await Product.find(filter)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(pageSize);
+
+    // Total count of products (for pagination)
+    const totalCount = await Product.countDocuments(filter);
+
+    res.json({
+      products,
+      totalCount,
+      totalPages: Math.ceil(totalCount / pageSize),
+      currentPage: pageNumber,
+      pageSize,
+    });
   } catch (error) {
-    console.error("Get products error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error('Get products error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
